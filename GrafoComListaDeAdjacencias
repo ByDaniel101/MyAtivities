@@ -1,0 +1,111 @@
+import java.util.ArrayList;
+import java.util.List;
+
+public class GrafoComListaDeAdjacencias implements Grafo {
+
+	private List<Vertice> vertices = new ArrayList<>();
+	private List<VerticeInterno> verticesInternos = new ArrayList<>();
+
+	public GrafoComListaDeAdjacencias(String... nomesVertices) {
+		for (String nomeVertice : nomesVertices) {
+			this.addVertice(nomeVertice);
+		}
+	}
+
+	@Override
+	public Vertice addVertice(String nome) {
+		Vertice vertice = new Vertice();
+		vertice.setNome(nome);
+		vertices.add(vertice);
+
+		VerticeInterno verticeInterno = new VerticeInterno();
+		verticeInterno.setVertice(vertice);
+		verticesInternos.add(verticeInterno);
+
+		return vertice;
+	}
+
+	public Vertice getVertice(String nome) {
+		for (Vertice vertice : vertices) {
+			if (vertice.getNome().equals(nome)) {
+				return vertice;
+			}
+		}
+
+		return null;
+	}
+
+	private VerticeInterno getVerticeInterno(Vertice v) {
+		for (VerticeInterno verticeInterno : verticesInternos) {
+			if (verticeInterno.getVertice().equals(v)) {
+				return verticeInterno;
+			}
+		}
+
+		throw new RuntimeException("Vertice interno nÃ£o encontrado");
+	}
+
+	@Override
+	public void addAresta(Vertice v1, Vertice v2) {
+
+		Aresta arestaNova = new Aresta();
+		arestaNova.setOrigem(v1);
+		arestaNova.setDestino(v2);
+
+		for (VerticeInterno v : this.verticesInternos) {
+			if (v.getVertice().equals(v1)) {
+				v.addAresta(arestaNova);
+			}
+		}
+	}
+
+	@Override
+	public List<Vertice> getVertices() {
+		return vertices;
+	}
+
+	@Override
+	public boolean segue(Vertice v1, Vertice v2) {
+
+		Aresta arestaCheck = new Aresta();
+		arestaCheck.setOrigem(v1);
+		arestaCheck.setDestino(v2);
+
+		for (VerticeInterno V : verticesInternos) {
+			if (V.getVertice().equals(v1)) {
+				for (Aresta arestas : V.getArestas()) {
+
+					if (arestas.getDestino().equals(v2)) {
+						return true;
+					}
+				}
+
+			}
+		}
+		return false;
+	}
+
+}
+
+class VerticeInterno {
+
+	private Vertice vertice;
+	private List<Aresta> arestas = new ArrayList<>();
+
+	public Vertice getVertice() {
+		return vertice;
+	}
+
+	public void setVertice(Vertice vertice) {
+		this.vertice = vertice;
+	}
+
+	public List<Aresta> getArestas() {
+		return arestas;
+	}
+
+	public void addAresta(Aresta arestaEntrada) {
+
+		this.arestas.add(arestaEntrada);
+	}
+}
